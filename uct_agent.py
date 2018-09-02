@@ -90,6 +90,39 @@ class TreeNode(object):
             self.parent.update_recursive(leaf_value)
         self.update(leaf_value)
 
+    def update_from_end_state(self, leaf_value):
+        '''
+        A new strategy, if state is end, update _Q to max(original _Q, final_result_in_this_simulation), if final result
+        is the currently best, update n_visit to be the most visited one
+        :param leaf_value:
+        :return:
+        '''
+        node = self
+        while True:
+            node.Q = max(node.Q, leaf_value)
+            if node.parent.parent is not None:
+                node = node.parent
+            else:
+                break
+
+        max_n_visits = 0
+        margin = 1
+        if leaf_value >= -config.BEST_ENERGY:
+            for child in node.parent.children.values():
+                if max_n_visits < child.n_visits:
+                    max_n_visits = child.n_visits
+            margin = max(1, max_n_visits - node.n_visits)
+
+        node = self
+        while True:
+            node.n_visits += margin
+            node.squared_Q_from_subtrees += leaf_value**2
+            if node.parent is not None:
+                node = node.parent
+            else:
+                break
+        pass
+
     def get_value(self, c_puct):
         """Calculate and return the value for this node.
         It is a combination of leaf evaluations Q, and this node's prior
@@ -171,8 +204,7 @@ class MCTS(object):
                 logging.info(config.BEST_ACTION_LIST)
                 logging.info("--------------")
 
-
-            node.update_recursive(leaf_value)
+            node.update_from_end_state(leaf_value)
             return value
 
     def _evaluate_rollout(self, state, limit=1000):
