@@ -6,6 +6,7 @@ import logging
 
 import config
 
+
 def rollout_policy_fn(state):
     """a coarse, fast version of policy_fn used in the rollout phase."""
     # rollout randomly
@@ -292,10 +293,10 @@ class UCTAgent(object):
         # the pi vector returned by MCTS as in the alphaGo Zero paper
         move_probs = np.zeros(len(config.ACTION_VECTOR_DICT.keys())-1)
         if len(sensible_moves) > 0:
-            acts, probs, value = self.mcts.get_move_probs(state, temp=temp)
+            acts, probs, value = self.mcts.get_move_probs(state, temp=1.5)
             move_probs[list(acts)] = probs
             #  if the mcts result doesn't point to an action strongly, give other actions an opportunity
-            if np.max(move_probs) < 0.85:
+            if np.max(move_probs) < 0.55:
                 temp = 0.7
             probs_with_temp = softmax(1.0 / temp * np.log(probs + 1e-10))
             if True:
