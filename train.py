@@ -6,8 +6,8 @@ import logging
 import os
 
 from HP_env import HPEnv
-# from mcts_agent import MCTSAgent
 from uct_agent import UCTAgent
+from p_v_network import ResNet
 import config
 
 
@@ -35,27 +35,13 @@ class TrainPipeline:
         self.pure_mcts_playout_num = 1000
         self.mcts_player = UCTAgent(c_puct=self.c_puct, n_playout=config.N_PLAYOUT)
 
-    # def get_equi_data(self, play_data):
-    #     """augment the data set by rotation and flipping
-    #     play_data: [(state, mcts_prob, winner_z), ..., ...]
-    #     """
-    #     extend_data = []
-    #     for state, mcts_porb, winner in play_data:
-    #         for i in [1, 2, 3, 4]:
-    #             # rotate counterclockwise
-    #             equi_state = np.array([np.rot90(s, i) for s in state])
-    #             equi_mcts_prob = np.rot90(np.flipud(
-    #                 mcts_porb.reshape(self.board_height, self.board_width)), i)
-    #             extend_data.append((equi_state,
-    #                                 np.flipud(equi_mcts_prob).flatten(),
-    #                                 winner))
-    #             # flip horizontally
-    #             equi_state = np.array([np.fliplr(s) for s in equi_state])
-    #             equi_mcts_prob = np.fliplr(equi_mcts_prob)
-    #             extend_data.append((equi_state,
-    #                                 np.flipud(equi_mcts_prob).flatten(),
-    #                                 winner))
-    #     return extend_data
+        if init_model_path:
+            # start training from an initial policy-value net
+            self.policy_value_net.restore_model(init_model_path)
+        else:
+            # start training from a new policy-value net
+            self.policy_value_net = ResNet()
+
 
     def collect_selfplay_data(self, n_games=1):
         """collect self-play data for training"""
@@ -80,6 +66,93 @@ class TrainPipeline:
                 ave_energy = 0
             return ave_energy
 
+    def policy_update(self, step):
+        """update the policy-value net"""
+        mini_batch = random.sample(self.data_buffer, self.batch_size)
+        state_batch = np.array([data[0][0] for data in mini_batch])
+        mcts_probs_batch = [data[1] for data in mini_batch]
+        energy_batch = np.array([data[2] for data in mini_batch])[:, np.newaxis]
+        old_probs, old_v = self.policy_value_net.policy_value(state_batch)
+
+        if step % 20 == 19:
+            logging.info(("number of 1 in batch:{:.1f}, "
+                          "number of 2 in batch:{:.1f}, "
+                          "number of 3 in batch:{:.1f}, "
+                          "number of 4 in batch:{:.1f}, "
+                          "number of 5 in batch:{:.1f}, "
+                          "number of 6 in batch:{:.1f}, "
+                          "number of 7 in batch:{:.1f}, "
+                          "number of 8 in batch:{:.1f}, "
+                          "number of 9 in batch:{:.1f}, "
+                          ).format(np.sum(energy_batch == 1),
+                                   np.sum(energy_batch == 2),
+                                   np.sum(energy_batch == 3),
+                                   np.sum(energy_batch == 4),
+                                   np.sum(energy_batch == 5),
+                                   np.sum(energy_batch == 6),
+                                   np.sum(energy_batch == 7),
+                                   np.sum(energy_batch == 8),
+                                   np.sum(energy_batch == 9),))
+
+        for i in range(self.epochs):
+            loss, policy_loss, value_loss, value_out_mean, entropy = self.policy_value_net.train_step(
+                    state_batch,
+                    mcts_probs_batch,
+                    energy_batch,
+                    self.learn_rate*self.lr_multiplier, step*self.epochs+i)
+            new_probs, new_v = self.policy_value_net.policy_value(state_batch)
+            kl = np.mean(np.sum(old_probs * (
+                    np.log(old_probs + 1e-10) - np.log(new_probs + 1e-10)),
+                    axis=1)
+            )
+            if kl > self.kl_targ * 4:  # early stopping if D_KL diverges badly
+                break
+        # adaptively adjust the learning rate
+        if kl > self.kl_targ * 2 and self.lr_multiplier > 0.1:
+            self.lr_multiplier /= 1.5
+        elif kl < self.kl_targ / 2 and self.lr_multiplier < 10:
+            self.lr_multiplier *= 1.5
+
+        # explained_var_old = (1 -
+        #                      np.var(np.array(winner_batch) - old_v.flatten()) /
+        #                      np.var(np.array(winner_batch)))
+        # explained_var_new = (1 -
+        #                      np.var(np.array(winner_batch) - new_v.flatten()) /
+        #                      np.var(np.array(winner_batch)))
+        print(("kl:{:.5f}, "
+               "lr_multiplier:{:.3f}, "
+               "loss:{:.3f}, "
+               "policy loss:{:.3f}, "
+               "value loss:{:.3f}, "
+               "value out mean:{:.3f}, "
+               "entropy:{:.3f}, "
+               ).format(kl,
+                        self.lr_multiplier,
+                        loss,
+                        policy_loss,
+                        value_loss,
+                        value_out_mean,
+                        entropy,
+                        ))
+        logging.info(("kl:{:.5f}, "
+               "lr_multiplier:{:.3f}, "
+               "loss:{:.3f}, "
+               "policy loss:{:.3f}, "
+               "value loss:{:.3f}, "
+               "value out mean:{:.3f}, "
+               "entropy:{:.3f}, "
+               ).format(kl,
+                        self.lr_multiplier,
+                        loss,
+                        policy_loss,
+                        value_loss,
+                        value_out_mean,
+                        entropy,
+                        ))
+        #  adjust c_puct to a reasonable number
+        self.mcts_player.mcts._c_puct = value_out_mean
+        return loss, entropy
+
 
     def run(self):
         """run the training pipeline"""
@@ -89,11 +162,13 @@ class TrainPipeline:
             for i in range(self.game_batch_num):
                 print("-----"+str(i)+"-----")
                 e = -self.collect_selfplay_data(self.play_batch_size)
+
+                if len(self.data_buffer) > self.batch_size:
+                    for j in range(config.N_POLICY_UPDATE):
+                        loss, entropy = self.policy_update(i*config.N_POLICY_UPDATE+j)
+
                 average_energy += e
-                print("batch i:{}, episode_len:{}".format(
-                        i+1, self.episode_len))
-                logging.info("batch i:{}, episode_len:{}".format(
-                        i+1, self.episode_len))
+
                 if i % 10 == 0:
                     print("Best energy: "+str(config.BEST_ENERGY))
                     logging.info("Best energy: "+str(config.BEST_ENERGY))
@@ -104,8 +179,8 @@ class TrainPipeline:
                     print("Average energy:{:.3f}".format(average_energy))
                     average_energy = 0
 
-                # if i % 300 == 13:
-                #     self.policy_value_net.save_model(i)
+                if i % 300 == 13:
+                    self.policy_value_net.save_model(i)
         except KeyboardInterrupt:
             print('\n\rquit')
 

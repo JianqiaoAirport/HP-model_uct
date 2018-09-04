@@ -133,6 +133,10 @@ class TreeNode(object):
         """
         self.u = (c_puct * self.P * np.sqrt(self.parent.n_visits) / (1 + self.n_visits))
         self.sp = np.sqrt((abs(self.squared_Q_from_subtrees - self.n_visits * self.Q ** 2)+40) / (self.n_visits + 1))
+        # print("--------")
+        # print(self.Q)
+        # print(self.u)
+        # print(self.sp)
         return self.Q + self.u + self.sp + 0.00001 * random.random()
 
     def is_leaf(self):
