@@ -1,7 +1,6 @@
 import logging
 import sys
 import numpy as np
-from p_v_network import ResNet
 
 import config
 

@@ -104,9 +104,9 @@ EPSILON = 0.25
 #  Training
 LEARNING_RATE = 1e-3
 TEMP = 0.0001
-N_PLAYOUT = 6000
+N_PLAYOUT = 6
 BUFFER_SIZE = 1000*SEQ_LENGTH
-BATCH_SIZE = 256
+BATCH_SIZE = 23
 KL_TARG = 0.0002
 GAME_BATCH_NUM = 2500
 EPOCH = 1
@@ -124,5 +124,5 @@ BEST_ACTION_LIST = []
 #  Path
 # WORK_PATH = "/nfshome/hangyu/HP-model_uct/"
 WORK_PATH = "./"
-MODEL_NAME = "UCT_"+str(len(HP_SEQ))+"_"+str(datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S'))
+MODEL_NAME = "ResNet_"+str(len(HP_SEQ))+"_"+str(datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S'))
 MODEL_PATH = WORK_PATH + 'models/' + MODEL_NAME + "/"
