@@ -117,7 +117,7 @@ class TreeNode(object):
         node = self
         while True:
             node.n_visits += margin
-            node.squared_Q_from_subtrees += leaf_value**2
+            node.squared_Q_from_subtrees += leaf_value**2*margin
             if node.parent is not None:
                 node = node.parent
             else:

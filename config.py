@@ -3,8 +3,6 @@ import sys
 import tensorflow as tf
 import datetime
 
-
-
 #  GPU
 GPU_WHEN_TRAINING = "4"
 
@@ -99,14 +97,14 @@ L2_REG = 0.0001
 N_BLOCKS = 7
 
 #  MCTS
-C_PUCT = 18
+C_PUCT = 100
 DIRICHLET = 1.5
 EPSILON = 0.25
 
 #  Training
 LEARNING_RATE = 1e-3
 TEMP = 0.0001
-N_PLAYOUT = 4000
+N_PLAYOUT = 6000
 BUFFER_SIZE = 50*SEQ_LENGTH
 BATCH_SIZE = 256
 KL_TARG = 0.0002
