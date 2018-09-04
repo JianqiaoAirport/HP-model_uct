@@ -187,6 +187,9 @@ class TrainPipeline:
 
 if __name__ == '__main__':
 
+    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+    os.environ["CUDA_VISIBLE_DEVICES"] = config.GPU_WHEN_TRAINING
+
     if not os.path.exists(config.MODEL_PATH):
         os.makedirs(config.MODEL_PATH)
 
