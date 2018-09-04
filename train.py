@@ -179,7 +179,7 @@ class TrainPipeline:
                     print("Average energy:{:.3f}".format(average_energy))
                     average_energy = 0
 
-                if i % 300 == 13:
+                if i % 100 == 13:
                     self.policy_value_net.save_model(i)
         except KeyboardInterrupt:
             print('\n\rquit')
