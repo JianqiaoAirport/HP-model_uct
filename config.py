@@ -7,7 +7,7 @@ import datetime
 GPU_WHEN_TRAINING = "4"
 
 #  Model Environment
-DIMENSIONALITY = 2
+DIMENSIONALITY = 3
 # 1 PHPPHPHHHPHHPHHHHH -9
 # 2 HHPPHPPHPPHPPHPPHPPHPPHH  -9
 # 3 HHPHPHPHPHHHHPHPPPHPPPHPPPPHPPPHPPPHPHHHHPHPHPHPHH  -21 -30
@@ -34,14 +34,14 @@ L2_REG = 0.0001
 N_BLOCKS = 7
 
 #  MCTS
-C_PUCT = 100
+C_PUCT = 15
 DIRICHLET = 1.5
 EPSILON = 0.25
 
 #  Training
 LEARNING_RATE = 1e-3
 TEMP = 0.0001
-N_PLAYOUT = 6
+N_PLAYOUT = 5000
 BUFFER_SIZE = 1000*SEQ_LENGTH
 BATCH_SIZE = 23
 KL_TARG = 0.0002
@@ -58,5 +58,5 @@ SESS_CONFIG.gpu_options.allow_growth = True
 #  Path
 # WORK_PATH = "/nfshome/hangyu/HP-model_uct/"
 WORK_PATH = "./"
-MODEL_NAME = "ResNet_"+SEQ_NAME+"_"+str(C_PUCT)+"_"+str(N_PLAYOUT)+"_"+str(datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S'))
+MODEL_NAME = "UCT_"+SEQ_NAME+"_"+str(C_PUCT)+"_"+str(N_PLAYOUT)+"_"+str(datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S'))
 MODEL_PATH = WORK_PATH + 'models/' + MODEL_NAME + "/"

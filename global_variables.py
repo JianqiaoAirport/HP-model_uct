@@ -92,6 +92,6 @@ else:
     logging.error("Dimensionality error")
     sys.exit(1)
 
-#  Global varibles
+#  Global variables
 BEST_ENERGY = 0
 BEST_ACTION_LIST = []
