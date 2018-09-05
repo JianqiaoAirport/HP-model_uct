@@ -12,7 +12,6 @@ def string_to_list(str):
             l.append(1)
     return l
 
-# HP_SEQ = [-1, -1, -1, 1, -1, 1, 1, -1, -1]
 
 SEQ = {}
 
