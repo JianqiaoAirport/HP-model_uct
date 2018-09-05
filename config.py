@@ -58,5 +58,5 @@ SESS_CONFIG.gpu_options.allow_growth = True
 #  Path
 # WORK_PATH = "/nfshome/hangyu/HP-model_uct/"
 WORK_PATH = "./"
-MODEL_NAME = "ResNet_"+SEQ_NAME+"_"+str(C_PUCT)+"_"+str(N_PLAYOUT)+str(datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S'))
+MODEL_NAME = "ResNet_"+SEQ_NAME+"_"+str(C_PUCT)+"_"+str(N_PLAYOUT)+"_"+str(datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S'))
 MODEL_PATH = WORK_PATH + 'models/' + MODEL_NAME + "/"
