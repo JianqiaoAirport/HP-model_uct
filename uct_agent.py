@@ -53,8 +53,6 @@ class TreeNode(object):
         self.Q = 0
         self.u = 0
         self.P = prior_p
-        self.squared_Q_from_subtrees = 0
-        self.sp = 0
 
     def expand(self, action_priors):
         """Expand tree by creating new children.
@@ -82,7 +80,6 @@ class TreeNode(object):
         self.n_visits += 1
         # Update Q, a running average of values for all visits.
         self.Q += 1.0 * (leaf_value - self.Q) / self.n_visits
-        self.squared_Q_from_subtrees += leaf_value ** 2
 
     def update_recursive(self, leaf_value):
         """Like a call to update(), but applied recursively for all ancestors.
@@ -118,7 +115,6 @@ class TreeNode(object):
         node = self
         while True:
             node.n_visits += margin
-            node.squared_Q_from_subtrees += leaf_value**2*margin
             if node.parent is not None:
                 node = node.parent
             else:
@@ -133,12 +129,7 @@ class TreeNode(object):
             value Q, and prior probability P, on this node's score.
         """
         self.u = (c_puct * self.P * np.sqrt(self.parent.n_visits) / (1 + self.n_visits))
-        self.sp = np.sqrt((abs(self.squared_Q_from_subtrees - self.n_visits * self.Q ** 2)+40) / (self.n_visits + 1))
-        # print("--------")
-        # print(self.Q)
-        # print(self.u)
-        # print(self.sp)
-        return self.Q + self.u + self.sp + 0.00001 * random.random()
+        return self.Q + self.u + 0.00001 * random.random()
 
     def is_leaf(self):
         """Check if leaf node (i.e. no nodes below this have been expanded).

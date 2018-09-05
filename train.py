@@ -7,7 +7,7 @@ import os
 
 from HP_env import HPEnv
 from uct_agent import UCTAgent
-from p_v_network import ResNet
+# from p_v_network import ResNet
 import config
 import global_variables
 
@@ -36,12 +36,12 @@ class TrainPipeline:
         self.pure_mcts_playout_num = 1000
         self.mcts_player = UCTAgent(c_puct=self.c_puct, n_playout=config.N_PLAYOUT)
 
-        if init_model_path:
-            # start training from an initial policy-value net
-            self.policy_value_net.restore_model(init_model_path)
-        else:
-            # start training from a new policy-value net
-            self.policy_value_net = ResNet()
+        # if init_model_path:
+        #     # start training from an initial policy-value net
+        #     self.policy_value_net.restore_model(init_model_path)
+        # else:
+        #     # start training from a new policy-value net
+        #     self.policy_value_net = ResNet()
 
 
     def collect_selfplay_data(self, n_games=1):
@@ -164,9 +164,9 @@ class TrainPipeline:
                 print("-----"+str(i)+"-----")
                 e = -self.collect_selfplay_data(self.play_batch_size)
 
-                if len(self.data_buffer) > self.batch_size:
-                    for j in range(config.N_POLICY_UPDATE):
-                        loss, entropy = self.policy_update(i*config.N_POLICY_UPDATE+j)
+                # if len(self.data_buffer) > self.batch_size:
+                #     for j in range(config.N_POLICY_UPDATE):
+                #         loss, entropy = self.policy_update(i*config.N_POLICY_UPDATE+j)
 
                 average_energy += e
 
@@ -180,8 +180,8 @@ class TrainPipeline:
                     print("Average energy:{:.3f}".format(average_energy))
                     average_energy = 0
 
-                if i % 100 == 13:
-                    self.policy_value_net.save_model(i)
+                # if i % 300 == 13:
+                #     self.policy_value_net.save_model(i)
         except KeyboardInterrupt:
             print('\n\rquit')
 
