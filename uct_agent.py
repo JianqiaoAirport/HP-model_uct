@@ -133,7 +133,7 @@ class TreeNode(object):
             value Q, and prior probability P, on this node's score.
         """
         self.u = (c_puct * self.P * np.sqrt(self.parent.n_visits) / (1 + self.n_visits))
-        self.sp = np.sqrt((abs(self.squared_Q_from_subtrees - self.n_visits * self.Q ** 2)+40) / (self.n_visits + 1))
+        self.sp = np.sqrt((abs(self.squared_Q_from_subtrees - self.n_visits * self.Q ** 2)+4) / (self.n_visits + 1))
         # print("--------")
         # print(self.Q)
         # print(self.u)

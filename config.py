@@ -18,8 +18,11 @@ DIMENSIONALITY = 2
 # 8 PPHPPPHPHHHHPPHHHHPHHPHHHPPHPHPHPPHPPPPPPHHPHHPH        -30
 # 9 PHHPPPPPPHHPPPHHHPHPPHPHHPPHPPHPPHHPPHHHHHHHPPHH        -30
 import global_variables
-HP_SEQ = global_variables.SEQ_3
+SEQ_NAME = "SEQ_3"
+HP_SEQ = global_variables.SEQ[SEQ_NAME]
+print(len(HP_SEQ))
 SEQ_LENGTH = len(HP_SEQ)
+
 
 #  Network
 if DIMENSIONALITY == 2:
@@ -28,7 +31,7 @@ elif DIMENSIONALITY == 3:
     VECTOR_LENGTH = 4
 N_FILTER = 64
 L2_REG = 0.0001
-N_BLOCKS = 7
+N_BLOCKS = 5
 
 #  MCTS
 C_PUCT = 100
@@ -38,7 +41,7 @@ EPSILON = 0.25
 #  Training
 LEARNING_RATE = 1e-3
 TEMP = 0.0001
-N_PLAYOUT = 6
+N_PLAYOUT = 6000
 BUFFER_SIZE = 1000*SEQ_LENGTH
 BATCH_SIZE = 256
 KL_TARG = 0.0002
@@ -55,5 +58,5 @@ SESS_CONFIG.gpu_options.allow_growth = True
 #  Path
 # WORK_PATH = "/nfshome/hangyu/HP-model_uct/"
 WORK_PATH = "./"
-MODEL_NAME = "UCT_"+str(len(HP_SEQ))+"_"+str(datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S'))
+MODEL_NAME = "ResNet_"+SEQ_NAME+"_"+str(C_PUCT)+"_"+str(N_PLAYOUT)+str(datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S'))
 MODEL_PATH = WORK_PATH + 'models/' + MODEL_NAME + "/"
