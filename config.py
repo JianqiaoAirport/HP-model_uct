@@ -18,7 +18,8 @@ DIMENSIONALITY = 2
 # 8 PPHPPPHPHHHHPPHHHHPHHPHHHPPHPHPHPPHPPPPPPHHPHHPH        -30
 # 9 PHHPPPPPPHHPPPHHHPHPPHPHHPPHPPHPPHHPPHHHHHHHPPHH        -30
 import global_variables
-HP_SEQ = global_variables.SEQ_3
+SEQ_NAME = "SEQ_3"
+HP_SEQ = global_variables.SEQ[SEQ_NAME]
 SEQ_LENGTH = len(HP_SEQ)
 
 # Network
@@ -57,5 +58,5 @@ SESS_CONFIG.gpu_options.allow_growth = True
 #  Path
 # WORK_PATH = "/nfshome/hangyu/HP-model_uct/"
 WORK_PATH = "./"
-MODEL_NAME = "ResNet_"+str(len(HP_SEQ))+"_"+str(datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S'))
+MODEL_NAME = "ResNet_"+SEQ_NAME+"_"+str(C_PUCT)+"_"+str(N_PLAYOUT)+"_"+str(datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S'))
 MODEL_PATH = WORK_PATH + 'models/' + MODEL_NAME + "/"
