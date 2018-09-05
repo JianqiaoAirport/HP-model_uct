@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.python.training.moving_averages import assign_moving_average
 
 import config
+import global_variables
 
 
 class ResNet:
@@ -13,7 +14,7 @@ class ResNet:
         self.model_name = config.MODEL_NAME
         self.input_len = config.SEQ_LENGTH  # number of the residues
         self.vector_len = config.VECTOR_LENGTH
-        self.n_class = len(config.ACTION_VECTOR_DICT.keys()) - 1
+        self.n_class = len(global_variables.ACTION_VECTOR_DICT.keys()) - 1
         self._global_step = tf.Variable(0, trainable=False, name='Global_Step')
         # placeholders
         self._tst = tf.placeholder(tf.bool, name='tst')
@@ -258,7 +259,7 @@ class ResNet:
         legal_actions = state.legal_action_list
         legal_actions_int = []
         for action in legal_actions:
-            legal_actions_int.append(config.ACTION_INT_DICT[action])
+            legal_actions_int.append(global_variables.ACTION_INT_DICT[action])
 
         encoded_state = state.encoded_state
 

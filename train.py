@@ -9,6 +9,7 @@ from HP_env import HPEnv
 from uct_agent import UCTAgent
 from p_v_network import ResNet
 import config
+import global_variables
 
 
 class TrainPipeline:
@@ -49,9 +50,9 @@ class TrainPipeline:
         ave_energy = 0
         for i in range(n_games):
             terminal_energy, action_list, play_data = self.env.generate_training_data(self.mcts_player, temp=self.temp)
-            if terminal_energy < config.BEST_ENERGY:
-                config.BEST_ENERGY = terminal_energy
-                config.BEST_ACTION_LIST = action_list
+            if terminal_energy < global_variables.BEST_ENERGY:
+                global_variables.BEST_ENERGY = terminal_energy
+                global_variables.BEST_ACTION_LIST = action_list
             play_data = list(play_data)[:]
             self.episode_len = len(play_data)
             # augment the data
@@ -170,10 +171,10 @@ class TrainPipeline:
                 average_energy += e
 
                 if i % 10 == 0:
-                    print("Best energy: "+str(config.BEST_ENERGY))
-                    logging.info("Best energy: "+str(config.BEST_ENERGY))
-                    print("Best action list: "+str(config.BEST_ACTION_LIST))
-                    logging.info("Best action list: "+str(config.BEST_ACTION_LIST))
+                    print("Best energy: "+str(global_variables.BEST_ENERGY))
+                    logging.info("Best energy: "+str(global_variables.BEST_ENERGY))
+                    print("Best action list: "+str(global_variables.BEST_ACTION_LIST))
+                    logging.info("Best action list: "+str(global_variables.BEST_ACTION_LIST))
                     average_energy /= 10
                     logging.info("Average energy:{:.3f}".format(average_energy))
                     print("Average energy:{:.3f}".format(average_energy))

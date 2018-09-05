@@ -4,6 +4,7 @@ import numpy as np
 from p_v_network import ResNet
 
 import config
+import global_variables
 
 
 class HPEnv:
@@ -23,7 +24,7 @@ class HPEnv:
         :return: history_location and pointer to current coordinate
         """
         history_location = {}
-        pointer = config.ACTION_VECTOR_DICT["START_TOKEN"]
+        pointer = global_variables.ACTION_VECTOR_DICT["START_TOKEN"]
         for i, action in enumerate(action_list):
             if action == "START_TOKEN":
                 if i != 0:
@@ -33,8 +34,8 @@ class HPEnv:
                     #  else:
                 history_location[pointer] = hp_seq[i]
             else:
-                if action in config.ACTION_VECTOR_DICT.keys():
-                    pointer = self.tuple_add(pointer, config.ACTION_VECTOR_DICT[action])
+                if action in global_variables.ACTION_VECTOR_DICT.keys():
+                    pointer = self.tuple_add(pointer, global_variables.ACTION_VECTOR_DICT[action])
                 else:
                     print("Undefined action error")
                     logging.error("Undefined action error")
@@ -66,7 +67,7 @@ class HPEnv:
         """
         if self.action_is_legal(action):
             self.action_list.append(action)
-            self.pointer = self.tuple_add(self.pointer, config.ACTION_VECTOR_DICT[action])
+            self.pointer = self.tuple_add(self.pointer, global_variables.ACTION_VECTOR_DICT[action])
             self.history_location[self.pointer] = self.hp_seq[len(self.action_list)-1]
             self.legal_action_list = self.get_legal_action_list()
             self.encoded_state = self.generate_encoded_state()
@@ -89,7 +90,7 @@ class HPEnv:
 
         continuous_h_count = 0  # record the number of continuous H residues
         neighbor_h_count = 0  # record the number of neighbor H residues
-        pointer = config.ACTION_VECTOR_DICT["START_TOKEN"]  # pointer_y to the current residues in np array
+        pointer = global_variables.ACTION_VECTOR_DICT["START_TOKEN"]  # pointer_y to the current residues in np array
         previous_residue = None  # previous_residues
 
         for i, action in enumerate(action_list):
@@ -100,8 +101,8 @@ class HPEnv:
                 current_residue = history_location[pointer]
             else:
                 #  construct the 2D or 3D structure
-                if action in config.ACTION_VECTOR_DICT.keys():
-                    pointer = self.tuple_add(pointer, config.ACTION_VECTOR_DICT[action])
+                if action in global_variables.ACTION_VECTOR_DICT.keys():
+                    pointer = self.tuple_add(pointer, global_variables.ACTION_VECTOR_DICT[action])
                 else:
                     return "Undefined action error"
 
@@ -116,11 +117,11 @@ class HPEnv:
                     continuous_h_count += 1
 
                 #  count the number of neighbor_h_count and neighbor_h_count
-                actions = list(config.ACTION_VECTOR_DICT.keys())
+                actions = list(global_variables.ACTION_VECTOR_DICT.keys())
                 actions.remove("START_TOKEN")
                 for a in actions:
                     #  get the nearby points, to see whether they are H residues
-                    temp_pointer = self.tuple_add(pointer, config.ACTION_VECTOR_DICT[a])
+                    temp_pointer = self.tuple_add(pointer, global_variables.ACTION_VECTOR_DICT[a])
                     if temp_pointer in history_location.keys():
                         if history_location[temp_pointer] == -1:
                             neighbor_h_count += 1
@@ -138,11 +139,11 @@ class HPEnv:
         visited_list = self.history_location.keys()
         legal_action_list = []
 
-        actions = list(config.ACTION_VECTOR_DICT.keys())
+        actions = list(global_variables.ACTION_VECTOR_DICT.keys())
         actions.remove("START_TOKEN")
 
         for action in actions:
-            new_place = self.tuple_add(self.pointer, config.ACTION_VECTOR_DICT[action])
+            new_place = self.tuple_add(self.pointer, global_variables.ACTION_VECTOR_DICT[action])
             if new_place not in visited_list:
                 legal_action_list.append(action)
         return legal_action_list
@@ -185,7 +186,7 @@ class HPEnv:
         for i, residue in enumerate(self.hp_seq):
             if i < len(self.action_list):
                 arr.append([residue])
-                arr[i].extend(list(config.ACTION_VECTOR_DICT[self.action_list[i]]))
+                arr[i].extend(list(global_variables.ACTION_VECTOR_DICT[self.action_list[i]]))
             else:
                 arr.append([residue])
                 arr[i].extend([0 for _ in range(config.DIMENSIONALITY)])
@@ -210,7 +211,7 @@ class HPEnv:
             state = self.encoded_state
             encoded_states.append(state)
             action, prob_list, value = agent.get_action(self, temp=temp, return_prob=True)
-            self.do_action(config.INT_ACTION_DICT[action])
+            self.do_action(global_variables.INT_ACTION_DICT[action])
             prob_lists.append(prob_list)
             value_list.append(value)
 

@@ -5,6 +5,7 @@ import random
 import logging
 
 import config
+import global_variables
 
 
 def rollout_policy_fn(state):
@@ -14,7 +15,7 @@ def rollout_policy_fn(state):
     legal_actions = state.legal_action_list
     legal_actions_int = []
     for action in legal_actions:
-        legal_actions_int.append(config.ACTION_INT_DICT[action])
+        legal_actions_int.append(global_variables.ACTION_INT_DICT[action])
 
     action_probs = np.random.rand(len(legal_actions))
     action_probs = (1 - 0.99) * action_probs + 0.01 * np.random.dirichlet(0.2 * np.ones(len(legal_actions)))
@@ -30,7 +31,7 @@ def policy_value_fn(state):
     legal_actions = state.legal_action_list
     legal_actions_int = []
     for action in legal_actions:
-        legal_actions_int.append(config.ACTION_INT_DICT[action])
+        legal_actions_int.append(global_variables.ACTION_INT_DICT[action])
 
     return zip(legal_actions_int, action_probs), 0
 
@@ -108,7 +109,7 @@ class TreeNode(object):
 
         max_n_visits = 0
         margin = 1
-        if leaf_value >= -config.BEST_ENERGY:
+        if leaf_value >= -global_variables.BEST_ENERGY:
             for child in node.parent.children.values():
                 if max_n_visits < child.n_visits:
                     max_n_visits = child.n_visits
@@ -179,7 +180,7 @@ class MCTS(object):
                 break
             # Greedily select next move.
             action, node = node.select(self._c_puct)
-            state.do_action(config.INT_ACTION_DICT[action])
+            state.do_action(global_variables.INT_ACTION_DICT[action])
 
         action_probs, leaf_value = self._policy(state)
         # Check for end of game
@@ -195,18 +196,18 @@ class MCTS(object):
             leaf_value = score
             value = score
 
-            if score > - config.BEST_ENERGY:
-                config.BEST_ENERGY = -score
-                config.BEST_ACTION_LIST = state.action_list
+            if score > - global_variables.BEST_ENERGY:
+                global_variables.BEST_ENERGY = -score
+                global_variables.BEST_ACTION_LIST = state.action_list
 
                 print("In play_out: ")
-                print(config.BEST_ENERGY)
-                print(config.BEST_ACTION_LIST)
+                print(global_variables.BEST_ENERGY)
+                print(global_variables.BEST_ACTION_LIST)
                 print("--------------")
 
                 logging.info("In play_out: ")
-                logging.info(config.BEST_ENERGY)
-                logging.info(config.BEST_ACTION_LIST)
+                logging.info(global_variables.BEST_ENERGY)
+                logging.info(global_variables.BEST_ACTION_LIST)
                 logging.info("--------------")
 
             node.update_from_end_state(leaf_value)
@@ -221,22 +222,22 @@ class MCTS(object):
             end = state.is_terminal()
             score = -state.get_energy()
             if end:
-                if score > - config.BEST_ENERGY:
-                    config.BEST_ENERGY = -score
-                    config.BEST_ACTION_LIST = state.action_list
+                if score > - global_variables.BEST_ENERGY:
+                    global_variables.BEST_ENERGY = -score
+                    global_variables.BEST_ACTION_LIST = state.action_list
                     print("In roll_out: ")
-                    print(config.BEST_ENERGY)
-                    print(config.BEST_ACTION_LIST)
+                    print(global_variables.BEST_ENERGY)
+                    print(global_variables.BEST_ACTION_LIST)
                     print("--------------")
 
                     logging.info("In roll_out: ")
-                    logging.info(config.BEST_ENERGY)
-                    logging.info(config.BEST_ACTION_LIST)
+                    logging.info(global_variables.BEST_ENERGY)
+                    logging.info(global_variables.BEST_ACTION_LIST)
                     logging.info("--------------")
                 return score
             action_probs = rollout_policy_fn(state)
             max_action = max(action_probs, key=itemgetter(1))[0]
-            state.do_action(config.INT_ACTION_DICT[max_action])
+            state.do_action(global_variables.INT_ACTION_DICT[max_action])
         else:
             # If no break from the loop, issue a warning.
             print("WARNING: rollout reached move limit")
@@ -295,7 +296,7 @@ class UCTAgent(object):
         """
         sensible_moves = state.legal_action_list
         # the pi vector returned by MCTS as in the alphaGo Zero paper
-        move_probs = np.zeros(len(config.ACTION_VECTOR_DICT.keys())-1)
+        move_probs = np.zeros(len(global_variables.ACTION_VECTOR_DICT.keys())-1)
         if len(sensible_moves) > 0:
             acts, probs, value = self.mcts.get_move_probs(state, temp=1.5)
             move_probs[list(acts)] = probs
