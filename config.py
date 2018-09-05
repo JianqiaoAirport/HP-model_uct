@@ -42,7 +42,7 @@ EPSILON = 0.25
 #  Training
 LEARNING_RATE = 1e-3
 TEMP = 0.0001
-N_PLAYOUT = 6
+N_PLAYOUT = 6000
 BUFFER_SIZE = 1000*SEQ_LENGTH
 BATCH_SIZE = 23
 KL_TARG = 0.0002
@@ -58,5 +58,5 @@ SESS_CONFIG.gpu_options.allow_growth = True
 #  Path
 # WORK_PATH = "/nfshome/hangyu/HP-model_uct/"
 WORK_PATH = "./"
-MODEL_NAME = "ResNet_"+SEQ_NAME+"_"+str(C_PUCT)+"_"+str(N_PLAYOUT)+"_"+str(datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S'))
+MODEL_NAME = "UCT_"+SEQ_NAME+"_"+str(C_PUCT)+"_"+str(N_PLAYOUT)+"_"+str(datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S'))
 MODEL_PATH = WORK_PATH + 'models/' + MODEL_NAME + "/"
