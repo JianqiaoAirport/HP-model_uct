@@ -133,7 +133,7 @@ class TreeNode(object):
             value Q, and prior probability P, on this node's score.
         """
         self.u = (c_puct * self.P * np.sqrt(self.parent.n_visits) / (1 + self.n_visits))
-        self.sp = np.sqrt((abs(self.squared_Q_from_subtrees - self.n_visits * self.Q ** 2)+4) / (self.n_visits + 1))
+        self.sp = np.sqrt((abs(self.squared_Q_from_subtrees - self.n_visits * self.Q ** 2)+40) / (self.n_visits + 1))
         # print("--------")
         # print(self.Q)
         # print(self.u)
@@ -296,7 +296,7 @@ class UCTAgent(object):
         """
         sensible_moves = state.legal_action_list
         # the pi vector returned by MCTS as in the alphaGo Zero paper
-        move_probs = np.zeros(len(global_variables.ACTION_VECTOR_DICT.keys()) - 1)
+        move_probs = np.zeros(len(global_variables.ACTION_VECTOR_DICT.keys())-1)
         if len(sensible_moves) > 0:
             acts, probs, value = self.mcts.get_move_probs(state, temp=1.5)
             move_probs[list(acts)] = probs

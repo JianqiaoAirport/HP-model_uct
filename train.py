@@ -151,7 +151,7 @@ class TrainPipeline:
                         entropy,
                         ))
         #  adjust c_puct to a reasonable number
-        self.mcts_player.mcts._c_puct = value_out_mean
+        # self.mcts_player.mcts._c_puct = value_out_mean
         return loss, entropy
 
 
