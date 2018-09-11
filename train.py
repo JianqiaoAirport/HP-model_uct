@@ -76,24 +76,24 @@ class TrainPipeline:
         old_probs, old_v = self.policy_value_net.policy_value(state_batch)
 
         if step % 20 == 19:
-            logging.info(("number of 1 in batch:{:.1f}, "
-                          "number of 2 in batch:{:.1f}, "
-                          "number of 3 in batch:{:.1f}, "
-                          "number of 4 in batch:{:.1f}, "
-                          "number of 5 in batch:{:.1f}, "
-                          "number of 6 in batch:{:.1f}, "
-                          "number of 7 in batch:{:.1f}, "
-                          "number of 8 in batch:{:.1f}, "
-                          "number of 9 in batch:{:.1f}, "
-                          ).format(np.sum(energy_batch == 1),
-                                   np.sum(energy_batch == 2),
-                                   np.sum(energy_batch == 3),
-                                   np.sum(energy_batch == 4),
-                                   np.sum(energy_batch == 5),
-                                   np.sum(energy_batch == 6),
-                                   np.sum(energy_batch == 7),
-                                   np.sum(energy_batch == 8),
-                                   np.sum(energy_batch == 9),))
+            logging.info(("number of 30 in batch:{:.1f}, "
+                          "number of 30 in batch:{:.1f}, "
+                          "number of 23 in batch:{:.1f}, "
+                          "number of 24 in batch:{:.1f}, "
+                          "number of 25 in batch:{:.1f}, "
+                          "number of 26 in batch:{:.1f}, "
+                          "number of 27 in batch:{:.1f}, "
+                          "number of 28 in batch:{:.1f}, "
+                          "number of 29 in batch:{:.1f}, "
+                          ).format(np.sum(energy_batch == 30),
+                                   np.sum(energy_batch == 22),
+                                   np.sum(energy_batch == 23),
+                                   np.sum(energy_batch == 24),
+                                   np.sum(energy_batch == 25),
+                                   np.sum(energy_batch == 26),
+                                   np.sum(energy_batch == 27),
+                                   np.sum(energy_batch == 28),
+                                   np.sum(energy_batch == 29),))
 
         for i in range(self.epochs):
             loss, policy_loss, value_loss, value_out_mean, entropy = self.policy_value_net.train_step(
@@ -152,6 +152,7 @@ class TrainPipeline:
                         ))
         #  adjust c_puct to a reasonable number
         # self.mcts_player.mcts._c_puct = value_out_mean
+        logging.info("value_out_mean: "+str(value_out_mean))
         return loss, entropy
 
 
